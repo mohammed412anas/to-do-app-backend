@@ -1,4 +1,5 @@
-import { addItem } from "./service";
+import { addItem, getItems } from "./service";
+import { ResponseType } from "./servicesTypes";
 
 const mockedTask = {
   id: String(new Date().valueOf()),
@@ -35,8 +36,13 @@ jest.mock("../config", () => ({
 
 describe(`Test services that which deals with firestore database`, () => {
   test("should mock the addItem and return mocked response", async () => {
-    const addTask = await addItem(mockedTask);
+    const addTask = await addItem(mockedTask) as ResponseType;
     expect(addTask.statusCode).toBe(201);
     expect(addTask.message).toBe("New task added successfully");
+  });
+  test("should mock the getItem and return mocked response", async () => {
+    const getTasks = await getItems() as ResponseType;
+    expect(getTasks.statusCode).toBe(200);
+    expect(getTasks.message).toBe("Tasks fetched Successfully");
   });
 });

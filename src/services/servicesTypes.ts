@@ -11,5 +11,6 @@ export type ResponseType = {
   message: string;
   tasks: task[];
 };
-type addItemType = (task: task) =>  Promise<ResponseType>;
+type addItemType = (task: task) =>  Promise<ResponseType|Error>;
+export type getItemType = () =>  Promise<ResponseType|Error>;
 export default addItemType;
