@@ -1,5 +1,10 @@
 import db from "../config";
-import addItemType, { getItemType, ResponseType, task } from "./servicesTypes";
+import addItemType, {
+  editItemType,
+  getItemType,
+  ResponseType,
+  task,
+} from "./servicesTypes";
 
 const response: ResponseType = {
   statusCode: 404,
@@ -28,9 +33,31 @@ export const getItems: getItemType = async () => {
   try {
     response.statusCode = 200;
     response.message = "Tasks fetched Successfully";
-    response.tasks = (await db.collection('user').get()).docs.map((doc) =>
+    response.tasks = (await db.collection("user").get()).docs.map((doc) =>
       doc.data()
     ) as task[];
+
+    return response;
+  } catch (error) {
+    return new Error(error as string);
+  }
+};
+
+export const editItem: editItemType = async (task) => {
+  try {
+    const collection = await db.collection("user").get();
+    const getTaskIds = collection.docs.map((doc) => doc.id);
+
+    response.statusCode = 404;
+    response.message = "Task not found";
+    response.tasks = []
+
+    if (getTaskIds.findIndex((id) => id === task.id) !== -1) {
+      await db.collection("user").doc(task.id).update(task);
+      response.statusCode = 201;
+      response.message = "Task editted successfully";
+      response.tasks = collection.docs.map((doc) => doc.data()) as task[];
+    }
 
     return response;
   } catch (error) {
