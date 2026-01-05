@@ -14,4 +14,5 @@ export type ResponseType = {
 type addItemType = (task: task) =>  Promise<ResponseType|Error>;
 export type getItemType = () =>  Promise<ResponseType|Error>;
 export type editItemType = (task: task) =>  Promise<ResponseType|Error>;
+export type deleteItemType = (taskId: string) =>  Promise<ResponseType|Error>;
 export default addItemType;

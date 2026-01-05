@@ -1,5 +1,6 @@
 import db from "../config";
 import addItemType, {
+  deleteItemType,
   editItemType,
   getItemType,
   ResponseType,
@@ -50,15 +51,37 @@ export const editItem: editItemType = async (task) => {
 
     response.statusCode = 404;
     response.message = "Task not found";
-    response.tasks = []
+    response.tasks = [];
 
     if (getTaskIds.findIndex((id) => id === task.id) !== -1) {
-      await db.collection("user").doc(task.id).update(task);
+      await db.collection("user").doc(task.id).set(task);
       response.statusCode = 201;
       response.message = "Task editted successfully";
       response.tasks = collection.docs.map((doc) => doc.data()) as task[];
     }
 
+    return response;
+  } catch (error) {
+    return new Error(error as string);
+  }
+};
+
+export const deleteItem: deleteItemType = async (taskId) => {
+  try {
+    const taskExist = await (
+      await db.collection("user").doc(taskId).get()
+    ).exists;
+
+    if (taskExist) {
+      await db.collection("user").doc(taskId).delete();
+      response.message = `Task has deleted successfully`;
+      response.statusCode = 204;
+      response.tasks = await (await db.collection('user').get()).docs.map((doc) => doc.data()) as task[];
+    } else {
+      response.statusCode = 404;
+      response.message = `No Task found with the Id : ${taskId}, Please provide the valid data`;
+      response.tasks = [];
+    }
     return response;
   } catch (error) {
     return new Error(error as string);
