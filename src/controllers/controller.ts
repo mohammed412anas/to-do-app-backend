@@ -48,6 +48,13 @@ export const editTask = async (req: Request, res: Response) => {
 export const deleteTask = async (req: Request, res: Response) => {
   try {
     const { taskId } = req.params;
+    if (!taskId) {
+      let response = {
+        statusCode: 400,
+        message: "Task id is not defined",
+      };
+      res.status(response.statusCode).contentType('json').json(response)
+    }
     const response = (await deleteItem(taskId)) as ResponseType;
     res.status(response.statusCode).contentType("json").json(response);
   } catch (error) {
