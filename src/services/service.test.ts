@@ -1,4 +1,4 @@
-import { addItem, editItem, getItems } from "./service";
+import { addItem, deleteItem, editItem, getItems } from "./service";
 import { ResponseType } from "./servicesTypes";
 
 const mockedTask = {
@@ -9,10 +9,11 @@ const mockedTask = {
   priority: "Mocked Priority",
   deadline: new Date(),
 };
-
+let exists = true;
 const mockedSet = jest.fn();
 const mockedUpdate = jest.fn();
-const mockedDoc = jest.fn(() => ({ set: mockedSet, update: mockedUpdate }));
+const mockedDelete = jest.fn();
+const mockedDoc = jest.fn(() => ({ set: mockedSet, update: mockedUpdate , get: mockedGet , delete:mockedDelete}));
 const mockedGet = jest.fn(() => ({
   docs: [
     {
@@ -20,6 +21,7 @@ const mockedGet = jest.fn(() => ({
       id: "Mocked Id",
     },
   ],
+  exists:exists
 }));
 const mockedCollection = {
   get: mockedGet,
@@ -31,6 +33,7 @@ jest.mock("../config", () => ({
 }));
 
 describe(`Test services that which deals with firestore database`, () => {
+  beforeEach(()=>jest.clearAllMocks())
   test("should mock the addItem and return mocked response", async () => {
     const addTask = (await addItem(mockedTask)) as ResponseType;
     expect(addTask.statusCode).toBe(201);
@@ -51,5 +54,16 @@ describe(`Test services that which deals with firestore database`, () => {
     const editTask = (await editItem(mockedTask)) as ResponseType;
     expect(editTask.statusCode).toBe(404);
     expect(editTask.message).toBe("Task not found");
+  });
+  test("should mock the deleteItem if the task is exist and return success response", async () => {
+    const deleteTask = (await deleteItem(mockedTask.id)) as ResponseType;
+    expect(deleteTask.statusCode).toBe(204);
+    expect(deleteTask.message).toBe("Task has deleted successfully");
+  });
+  test("should mock the deleteItem but do not delete if task don't exist on database and return ", async () => {
+    exists=false;
+    const deleteTask = (await deleteItem(mockedTask.id)) as ResponseType;
+    expect(deleteTask.statusCode).toBe(404);
+    expect(deleteTask.message).toEqual(`No Task found with the Id : ${mockedTask.id}, Please provide the valid data`);
   });
 });
