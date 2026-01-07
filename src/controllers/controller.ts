@@ -31,6 +31,13 @@ export const getTasks = async (req: Request, res: Response) => {
 export const editTask = async (req: Request, res: Response) => {
   try {
     const { task } = req.body;
+    if (!task) {
+      let response = {
+        statusCode: 400,
+        message: "Task is not defined",
+      };
+      res.status(response.statusCode).contentType('json').json(response)
+    }
     const response = (await editItem(task)) as ResponseType;
     res.status(response.statusCode).contentType("json").json(response);
   } catch (error) {
